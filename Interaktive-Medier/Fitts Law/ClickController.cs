@@ -55,15 +55,10 @@ public class ClickController : MonoBehaviour {
 			} catch(TimeoutException ex){
 
 			}
-			//int val = port.ReadByte();
-			//print(val);
 		}
 
-		// Vector3 xPos = new Vector3(4*val/1023f-2, transform.position.y, transform.position.z);
 
 		Ray ray = new Ray (pointer.transform.position, pointer.transform.forward);
-		//Ray ray = GameObject.Find ("pointer").transform.position;
-		// pointer.transform.getpo .ScreenPointToRay (xPos);
 		Debug.DrawRay (ray.origin, ray.direction * 10, Color.yellow);
 
 		if (val4==0) { //button 
