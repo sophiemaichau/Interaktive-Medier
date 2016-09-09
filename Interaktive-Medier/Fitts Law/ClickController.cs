@@ -30,7 +30,7 @@ public class ClickController : MonoBehaviour {
 		count = 10;
 		time = 0;
 		SetCountText ();
-	    // cube2.gameObject.GetComponent<Renderer> ().material.color = Color.yellow;
+	    cube2.gameObject.GetComponent<Renderer> ().material.color = Color.yellow;
 
 		port = new SerialPort ("/dev/cu.wchusbserialfa130", 9600);
 		port.Open();
@@ -50,7 +50,7 @@ public class ClickController : MonoBehaviour {
 				val = val2 * 256 + val3;
 				val4 = port.ReadByte();
 				print(val4);
-				transform.position = new Vector3(4*val/1023f-2, transform.position.y, transform.position.z);
+				pointer.transform.position = new Vector3(4*val/1023f-2, transform.position.y, transform.position.z);
 
 			} catch(TimeoutException ex){
 
@@ -59,14 +59,14 @@ public class ClickController : MonoBehaviour {
 			//print(val);
 		}
 
-		Vector3 xPos = new Vector3(4*val/1023f-2, transform.position.y, transform.position.z);
+		// Vector3 xPos = new Vector3(4*val/1023f-2, transform.position.y, transform.position.z);
 
-		Ray ray = new Ray(transform.position, pointer.gameObject.transform.position);
+		Ray ray = new Ray (pointer.transform.position, pointer.transform.forward);
 		//Ray ray = GameObject.Find ("pointer").transform.position;
 		// pointer.transform.getpo .ScreenPointToRay (xPos);
 		Debug.DrawRay (ray.origin, ray.direction * 10, Color.yellow);
 
-		if (val4==0) { //left mouse click
+		if (val4==0) { //button 
 			if (count < 10 && count > 0) {
 				time = Time.unscaledTime;
 			}
