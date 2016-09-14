@@ -11,6 +11,7 @@ void loop() {
   int val2 = val/256;
   int val3 = val%256;
   int val4 = digitalRead(button);
+  Serial.print(val);
   Serial.write(val2);
   Serial.write(val3);
   Serial.write(val4);
