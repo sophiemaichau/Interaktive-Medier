@@ -6,12 +6,13 @@ using System;
 
 public class ClickController : MonoBehaviour {
 
+	public Camera camera;
+	Rigidbody rb;
 	public Text countText;
 	public Text timeText;
 	public GameObject cubeRight;
 	public GameObject cubeLeft;
 	public GameObject pointer; 
-	public Rigidbody rb;
 
 	private int count;
 	private float time;
@@ -28,7 +29,11 @@ public class ClickController : MonoBehaviour {
 	private float cubeLxPos;
 	private float pointerXpos;
 	private float lastClick;
-	private Char controller = 'a';
+	private Char controller = 'p'; // p position, r rate, a acceleration
+	private Boolean touched = false;
+	private float timer = 0f;
+	private float cWidth;
+	private float cHeight;
 
 	SerialPort port;
 
@@ -40,6 +45,9 @@ public class ClickController : MonoBehaviour {
 		SetCountText ();
 		cubeLeft.gameObject.GetComponent<Renderer> ().material.color = Color.yellow;
 		rb = pointer.GetComponent<Rigidbody> ();
+		camera = GetComponent<Camera>();
+//		cHeight = camera.orthographicSize;
+//		cWidth = camera.aspect * cHeight;
 
 		port = new SerialPort ("/dev/cu.wchusbserialfa130", 9600);
 		port.Open();
@@ -62,12 +70,12 @@ public class ClickController : MonoBehaviour {
 				val3 = port.ReadByte();
 				val = val2 * 256 + val3;
 				val4 = port.ReadByte();
-				gameController(controller);
+				pointer.transform.position = new Vector3((4*val/1023f-2), transform.position.y, transform.position.z);
 			} catch(TimeoutException){
 
 			}
 			//			int val = port.ReadByte();
-			print(val);
+			// print(val);
 		}
 
 		if (val4==0) { //button
@@ -88,8 +96,8 @@ public class ClickController : MonoBehaviour {
 					cubeLeft.gameObject.GetComponent<Renderer> ().material.color = Color.yellow;
 					cubeRight.gameObject.GetComponent<Renderer> ().material.color = Color.white;
 				}
-				count--;
-				SetCountText ();
+				//count--;
+				//SetCountText ();
 			}
 		}
 	}
@@ -119,25 +127,27 @@ public class ClickController : MonoBehaviour {
 
 	void gameController(Char c){
 		if(c=='p'){
-			pointer.transform.position = new Vector3(4*val/1023f-2, transform.position.y, transform.position.z);
+			float newVal = val - 505f;
+			pointer.transform.position = new Vector3(((newVal/cWidth)/2)+5.83f, transform.position.y, transform.position.z);
 		}
+
 		if(c=='r'){
-			if (val >= 527) {
-				pointer.transform.position = new Vector3(transform.position.x+2, transform.position.y, transform.position.z);
-			}
-			if (val < 490) {
-				pointer.transform.position = new Vector3 (transform.position.x - 2, transform.position.y, transform.position.z);
-			}
-//			if(val < 527 || val >= 490){
-//				pointer.transform.position.x = 0f;
-//			}
-		}
-		if(c=='a'){
-			if(val >= 527){
-				rb.AddForce (pointer.transform.right * 2f);
+			float thrust = 2;
+			if(val > 520){
+				rb.AddForce(pointer.transform.right * thrust);
 			}
 			if(val < 490){
-				rb.AddForce (pointer.transform.right * -2f);
+				rb.AddForce((pointer.transform.right*-1) * thrust);
+
+			}
+		}
+			
+		if(c=='a'){
+			if(val >= 527){
+				pointer.transform.position = new Vector3 (pointer.transform.position.x + 0.3f, pointer.transform.position.y, pointer.transform.position.z);
+			}
+			if(val < 490){
+				pointer.transform.position = new Vector3 (pointer.transform.position.x - 0.3f, pointer.transform.position.y, pointer.transform.position.z);
 			}
 		}
 	}

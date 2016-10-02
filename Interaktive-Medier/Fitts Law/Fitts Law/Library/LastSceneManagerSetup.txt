@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_Scenes/Fitts Law Minigame.unity
+- path: Assets/_Scenes/HeroMinigame.unity
   isLoaded: 1
   isActive: 1
