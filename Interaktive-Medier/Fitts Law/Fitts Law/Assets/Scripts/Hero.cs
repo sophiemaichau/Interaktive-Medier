@@ -8,9 +8,12 @@ using UnityEngine.Networking;
 public class Hero : MonoBehaviour {
 
 	CharacterController hero;
+	CharacterController protector;
 	public GameObject bulletPrefab;
 	public Transform bulletSpawn;
 
+	float velXprotect = 0;
+	float velYprotect = 0;
 	float velX = 0;
 	float velY = 0;
 	const float gravity = -14.0f;
@@ -27,6 +30,7 @@ public class Hero : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		hero = GameObject.FindGameObjectWithTag ("Hero").GetComponent<CharacterController> ();
+		protector = GameObject.FindGameObjectWithTag ("Protector").GetComponent<CharacterController> ();
 		port = new SerialPort ("/dev/cu.wchusbserialfa130", 9600);
 		port.Open ();
 	}
@@ -49,50 +53,9 @@ public class Hero : MonoBehaviour {
 			}
 		}
 
-		/* PROTECTOR */
+		heroMove ();
+		protectorMove ();
 
-		if (Input.GetKeyDown(KeyCode.Space)){
-			Fire();
-		}
-		velY += gravity * Time.deltaTime;
-		float accelerationX = hero.isGrounded ? 18 : 8;
-
-		//Input.GetKey (KeyCode.LeftArrow)
-		if (val < 490) {
-			velX -= accelerationX * Time.deltaTime;
-		} // Input.GetKey(KeyCode.RightArrow)
-		else if(val >= 527){
-			velX += accelerationX * Time.deltaTime;
-		}
-		else{
-			velX *= hero.isGrounded? 0.07f : 0.98f;
-		}
-			
-		hero.Move (new Vector3 (velX*Time.deltaTime, velY * Time.deltaTime));
-
-		if(hero.isGrounded){
-			// Input.GetKeyDown (KeyCode.Space)
-			if(val4==0){
-				velY += jumpspeed;
-			}
-			else{
-				velY = 0;
-			}
-		}
-
-		ray = new Ray (
-			transform.position,
-			velX>0 ? Vector3.right : Vector3.left
-			);
-		RaycastHit hitInfo;
-		bool hit = Physics.Raycast (ray, out hitInfo,rayLength,1 << 10);
-
-		if (hit) {
-			Collider collider = hitInfo.collider;
-			//print (collider);
-			Rigidbody rb = collider.GetComponent<Rigidbody>();
-			rb.AddForceAtPosition (ray.direction * 3, ray.origin, ForceMode.VelocityChange);
-		}
 	}
 
 	void OnDrawGizmos(){
@@ -113,6 +76,75 @@ public class Hero : MonoBehaviour {
 			bulletSpawn.rotation);
 		bullet.gameObject.GetComponent<Rigidbody>().velocity = bullet.transform.right * 6;
 		Destroy(bullet, 2.0f);   
+	}
+
+	void heroMove(){
+
+		/* HERO */
+
+		if (Input.GetKeyDown(KeyCode.Space)){
+			Fire();
+		}
+		velY += gravity * Time.deltaTime;
+		float accelerationX = hero.isGrounded ? 18 : 8;
+
+		//Input.GetKey (KeyCode.LeftArrow)
+		if (val < 490) {
+			velX -= accelerationX * Time.deltaTime;
+		} // Input.GetKey(KeyCode.RightArrow)
+		else if(val >= 527){
+			velX += accelerationX * Time.deltaTime;
+		}
+		else{
+			velX *= hero.isGrounded? 0.07f : 0.98f;
+		}
+
+		hero.Move (new Vector3 (velX*Time.deltaTime, velY * Time.deltaTime));
+
+		if(hero.isGrounded){
+			// Input.GetKeyDown (KeyCode.Space)
+			if(val4==0){
+				velY += jumpspeed;
+			}
+			else{
+				velY = 0;
+			}
+		}
+
+		ray = new Ray (
+			transform.position,
+			velX>0 ? Vector3.right : Vector3.left
+		);
+		RaycastHit hitInfo;
+		bool hit = Physics.Raycast (ray, out hitInfo,rayLength,1 << 10);
+
+		if (hit) {
+			Collider collider = hitInfo.collider;
+			//print (collider);
+			Rigidbody rb = collider.GetComponent<Rigidbody>();
+			rb.AddForceAtPosition (ray.direction * 3, ray.origin, ForceMode.VelocityChange);
+		}
+	}
+
+	void protectorMove(){
+
+		/* PROTECTOR */
+
+		velYprotect += gravity * Time.deltaTime;
+		float accelProtectX = protector.isGrounded ? 18 : 8;
+
+		if (Input.GetKey (KeyCode.LeftArrow)) {
+			velXprotect -= accelProtectX * Time.deltaTime;
+		}
+		else if(Input.GetKey(KeyCode.RightArrow)){
+			velXprotect += accelProtectX * Time.deltaTime;
+		}
+		else{
+			velXprotect *= protector.isGrounded? 0.07f : 0.98f;
+		}
+
+		protector.Move (new Vector3 (velXprotect*Time.deltaTime, velYprotect * Time.deltaTime));
+
 	}
 
 }
